@@ -1,48 +1,36 @@
 # Security record
 
-This is a living record of the hardening state of the two `zerotrustdavid` profile
-repositories. It is edited in place as settings change — it does not accumulate
-dated entries.
-
-Both repos were built and pushed from an environment with GitHub write access but
-no access to repository-administration endpoints (branch protection, security-and-analysis,
-Actions permissions). The state below is what was live-verified from that
-environment; the target-state commands still to be run locally are recorded under
-"Outstanding" for each repo so this file stays accurate rather than aspirational.
-
-## zerotrustdavid/zerotrustdavid
-
-- **Visibility:** public (verified).
-- **Purpose:** profile README only — no tooling, no workflows.
-- **Collaborators:** owner only, no outside collaborators (verified via the GitHub API).
-- **Branch protection on `main`:** not yet configured.
-- **Secret scanning / push protection / Dependabot security updates:** not yet configured (repository defaults).
-- **Private vulnerability reporting:** not yet configured.
-- **Actions default workflow permissions:** not yet configured (repository defaults; this repo carries no workflows).
-- **Signed commits on `main`:** not required yet.
-- **`has_wiki` / `has_projects`:** on (repository defaults) — target is off.
+This is a living record of the hardening state of this repository. It is
+edited in place as settings change — it does not accumulate dated entries.
+[zerotrustdavid/SECURITY.md](https://github.com/zerotrustdavid/zerotrustdavid/blob/main/SECURITY.md)
+holds the record for the other profile repository.
 
 ## zerotrustdavid/profileassets
 
-- **Visibility:** public (verified).
-- **Purpose:** banner assets, lint tooling, and this security record for both repos.
+- **Visibility:** public (verified via the GitHub API).
+- **Purpose:** banner assets, lint tooling, and this security record.
 - **Collaborators:** owner only, no outside collaborators (verified via the GitHub API).
 - **CI:** `.github/workflows/lint.yml` — markdown lint and link-check, third-party actions pinned to commit SHA, `permissions: contents: read`.
-- **Branch protection on `main`:** not yet configured.
-- **Secret scanning / push protection / Dependabot security updates:** not yet configured (repository defaults).
-- **Private vulnerability reporting:** not yet configured.
-- **Actions default workflow permissions:** not yet configured (repository defaults).
-- **Signed commits on `main`:** not required yet.
-- **`has_wiki` / `has_projects`:** on (repository defaults) — target is off.
+- **Branch protection on `main`:** not confirmed. No branch ruleset has been
+  seen for this repo specifically — only `zerotrustdavid/zerotrustdavid`'s has
+  been checked, and it applied to zero targets when last checked.
+- **Secret scanning / push protection / Dependabot security updates:** not
+  confirmed. The environment that verified this record has no route to the
+  repository security-settings API — check directly under Settings → Code security.
+- **Private vulnerability reporting:** not confirmed.
+- **Actions default workflow permissions:** not confirmed.
+- **Signed commits on `main`:** not required, as last checked.
+- **`has_wiki` / `has_projects`:** on, as last confirmed live via the GitHub API — target is off.
 - **Secrets stored:** none. Stats cards are unauthenticated public reads; no token is needed or present.
 
-## Outstanding — run locally with an authenticated `gh`
+## Outstanding — verify and, where missing, apply
 
-The environment that built these repos could reach the GitHub REST API only through
-a restricted MCP tool surface (repo creation, file commits, collaborator listing) and
-had no route to the administration endpoints below. Run this once, from a machine
-with `gh auth status` showing `zerotrustdavid`, to bring both repos to the target
-state, then update the sections above to match what a fresh query returns:
+The environment that built and verifies this record can reach GitHub only
+through a restricted API surface (repo creation, file commits, collaborator
+and repository-metadata reads) with no route to branch-ruleset or
+security-and-analysis administration endpoints. Confirm each of these
+directly (Settings UI or an authenticated `gh`) and update this file to match
+what you actually see — not what a command was expected to do:
 
 ```bash
 for REPO in zerotrustdavid profileassets; do
@@ -65,27 +53,18 @@ JSON
   gh api --method PUT "repos/zerotrustdavid/${REPO}/actions/permissions/workflow" --input - <<'JSON'
 { "default_workflow_permissions": "read", "can_approve_pull_request_reviews": false }
 JSON
-  gh api --method PUT "repos/zerotrustdavid/${REPO}/branches/main/protection" --input - <<'JSON'
-{
-  "required_status_checks": null,
-  "enforce_admins": true,
-  "required_pull_request_reviews": {
-    "required_approving_review_count": 1,
-    "dismiss_stale_reviews": true
-  },
-  "restrictions": null,
-  "allow_force_pushes": false,
-  "allow_deletions": false,
-  "required_conversation_resolution": true
-}
-JSON
-  gh api --method POST "repos/zerotrustdavid/${REPO}/branches/main/protection/required_signatures"
 done
 ```
 
-For `profileassets`, once the above is applied, also add the `markdown-lint` and
-`link-check` check names to `required_status_checks` so a PR cannot merge on a
-failing lint.
+Branch protection is now set up as a repository ruleset rather than the
+classic branch-protection API (Settings → Rulesets) — for each repo, confirm
+the ruleset actually targets the `main` branch (a ruleset with no target
+applies to nothing) and carries: require a pull request before merging,
+restrict deletions, block force pushes, and signed commits.
 
-Re-query after running this and update the two sections above with the live result —
-do not mark a setting as applied without the confirming API response in hand.
+For `profileassets`, once its ruleset is targeted at `main`, also add the
+`markdown-lint` and `link-check` check names as required status checks so a
+PR cannot merge on a failing lint.
+
+Re-verify after any change and update the section above with the live
+result — do not mark a setting as applied without the confirming state in hand.
