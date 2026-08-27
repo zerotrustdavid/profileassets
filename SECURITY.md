@@ -10,7 +10,8 @@ holds the record for the other profile repository.
 - **Visibility:** public (verified via the GitHub API).
 - **Purpose:** banner assets, lint tooling, and this security record.
 - **Collaborators:** owner only, no outside collaborators (verified via the GitHub API).
-- **CI:** `.github/workflows/lint.yml` — markdown lint and link-check, third-party actions pinned to commit SHA, `permissions: contents: read`.
+- **CI:** `.github/workflows/lint.yml` — markdown lint and link-check, third-party actions pinned to commit SHA, `permissions: contents: read`. Note: `markdown-lint` was red from the very first commit until 2026-08-27 (default 80-character line cap tripped by the intentionally long bio/badge lines) — undetected until the ruleset's required checks blocked a merge and forced it to surface. Fixed via `.markdownlint.json` (`MD013: false`); both checks are green as of the current `main`.
+- **Code scanning:** a CodeQL default-setup workflow is active on this repo (owner-enabled) and has run green on every push and PR so far.
 - **Branch protection on `main`:** a ruleset now targets `main` and requires a
   pull request before merging, restrict deletions, block force pushes, and
   the `markdown-lint` and `link-check` status checks (owner-reported; no tool
@@ -22,25 +23,17 @@ holds the record for the other profile repository.
 - **Private vulnerability reporting:** not confirmed.
 - **Actions default workflow permissions:** not confirmed.
 - **Signed commits on `main`:** not confirmed whether ticked on the ruleset.
-- **`has_wiki` / `has_projects`:** on, as last confirmed live via the GitHub API — target is off.
-- **Secrets stored:** none. Stats cards are unauthenticated public reads; no token is needed or present.
+- **`has_wiki` / `has_projects`:** off (confirmed live via the GitHub API).
+- **Secrets stored:** none. Stats cards are unauthenticated public reads; no token is needed or present. The profile README no longer embeds stats cards at all (removed 2026-08-27 — the public github-readme-stats.vercel.app instance kept rendering broken even on the built-in theme).
 
 ## Outstanding
 
-Settings-page checklist (this environment has no tool that reaches any of
-these endpoints, so they must be applied and confirmed directly):
-
-1. **Settings → General → Features** — untick Wikis and Projects.
-2. **Settings → General → Pull Requests** — tick "Automatically delete head
-   branches"; untick "Allow merge commits" and "Allow rebase merging", leave
-   "Allow squash merging" ticked.
-3. **Settings → Advanced Security** — enable Secret scanning, its Push
-   protection sub-toggle, and Dependabot security updates. Public repos
-   sometimes ship with secret scanning already on — check current state first.
-4. Same page — enable Private vulnerability reporting.
-5. **Settings → Actions → General → Workflow permissions** — select "Read
-   repository contents permission"; untick "Allow GitHub Actions to create
-   and approve pull requests".
-6. On this repo's ruleset, tick "Require signed commits".
-7. Re-verify with a live query (API or the Settings UI) and update this file
-   to match — do not mark an item done without seeing the confirming state.
+Still not independently confirmed (this environment has no tool that reaches
+these endpoints, so they can only be taken on the owner's word or checked
+directly): secret scanning, push protection, Dependabot security updates,
+private vulnerability reporting, Actions default workflow permissions,
+delete-branch-on-merge and merge-method restrictions, and whether "Require
+signed commits" is ticked on this repo's ruleset. Confirm each under
+Settings → Advanced Security / General / Actions / Rulesets, and update the
+relevant line above once seen — not on the strength of a toggle having been
+clicked.
