@@ -11,60 +11,36 @@ holds the record for the other profile repository.
 - **Purpose:** banner assets, lint tooling, and this security record.
 - **Collaborators:** owner only, no outside collaborators (verified via the GitHub API).
 - **CI:** `.github/workflows/lint.yml` — markdown lint and link-check, third-party actions pinned to commit SHA, `permissions: contents: read`.
-- **Branch protection on `main`:** not confirmed. No branch ruleset has been
-  seen for this repo specifically — only `zerotrustdavid/zerotrustdavid`'s has
-  been checked, and it applied to zero targets when last checked.
+- **Branch protection on `main`:** a ruleset now targets `main` and requires a
+  pull request before merging, restrict deletions, block force pushes, and
+  the `markdown-lint` and `link-check` status checks (owner-reported; no tool
+  available to this record's verifying environment can read rulesets, so this
+  is taken on the owner's word, not independently confirmed).
 - **Secret scanning / push protection / Dependabot security updates:** not
   confirmed. The environment that verified this record has no route to the
-  repository security-settings API — check directly under Settings → Code security.
+  repository security-settings API — check directly under Settings → Advanced Security.
 - **Private vulnerability reporting:** not confirmed.
 - **Actions default workflow permissions:** not confirmed.
-- **Signed commits on `main`:** not required, as last checked.
+- **Signed commits on `main`:** not confirmed whether ticked on the ruleset.
 - **`has_wiki` / `has_projects`:** on, as last confirmed live via the GitHub API — target is off.
 - **Secrets stored:** none. Stats cards are unauthenticated public reads; no token is needed or present.
 
-## Outstanding — verify and, where missing, apply
+## Outstanding
 
-The environment that built and verifies this record can reach GitHub only
-through a restricted API surface (repo creation, file commits, collaborator
-and repository-metadata reads) with no route to branch-ruleset or
-security-and-analysis administration endpoints. Confirm each of these
-directly (Settings UI or an authenticated `gh`) and update this file to match
-what you actually see — not what a command was expected to do:
+Settings-page checklist (this environment has no tool that reaches any of
+these endpoints, so they must be applied and confirmed directly):
 
-```bash
-for REPO in zerotrustdavid profileassets; do
-  gh api --method PATCH "repos/zerotrustdavid/${REPO}" --input - <<'JSON'
-{
-  "security_and_analysis": {
-    "secret_scanning": { "status": "enabled" },
-    "secret_scanning_push_protection": { "status": "enabled" },
-    "dependabot_security_updates": { "status": "enabled" }
-  },
-  "delete_branch_on_merge": true,
-  "allow_squash_merge": true,
-  "allow_merge_commit": false,
-  "allow_rebase_merge": false,
-  "has_wiki": false,
-  "has_projects": false
-}
-JSON
-  gh api --method PUT "repos/zerotrustdavid/${REPO}/private-vulnerability-reporting"
-  gh api --method PUT "repos/zerotrustdavid/${REPO}/actions/permissions/workflow" --input - <<'JSON'
-{ "default_workflow_permissions": "read", "can_approve_pull_request_reviews": false }
-JSON
-done
-```
-
-Branch protection is now set up as a repository ruleset rather than the
-classic branch-protection API (Settings → Rulesets) — for each repo, confirm
-the ruleset actually targets the `main` branch (a ruleset with no target
-applies to nothing) and carries: require a pull request before merging,
-restrict deletions, block force pushes, and signed commits.
-
-For `profileassets`, once its ruleset is targeted at `main`, also add the
-`markdown-lint` and `link-check` check names as required status checks so a
-PR cannot merge on a failing lint.
-
-Re-verify after any change and update the section above with the live
-result — do not mark a setting as applied without the confirming state in hand.
+1. **Settings → General → Features** — untick Wikis and Projects.
+2. **Settings → General → Pull Requests** — tick "Automatically delete head
+   branches"; untick "Allow merge commits" and "Allow rebase merging", leave
+   "Allow squash merging" ticked.
+3. **Settings → Advanced Security** — enable Secret scanning, its Push
+   protection sub-toggle, and Dependabot security updates. Public repos
+   sometimes ship with secret scanning already on — check current state first.
+4. Same page — enable Private vulnerability reporting.
+5. **Settings → Actions → General → Workflow permissions** — select "Read
+   repository contents permission"; untick "Allow GitHub Actions to create
+   and approve pull requests".
+6. On this repo's ruleset, tick "Require signed commits".
+7. Re-verify with a live query (API or the Settings UI) and update this file
+   to match — do not mark an item done without seeing the confirming state.
