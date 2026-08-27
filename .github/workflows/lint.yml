@@ -1,0 +1,24 @@
+name: Lint
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  markdown-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@f548e57e544e1ff5a4c46bf1e1b8685f8e4a348a # main
+      - uses: DavidAnson/markdownlint-cli2-action@84611f6fdd14490f100dd3f9fc9df32c24ccbeb6 # main
+        with:
+          globs: '**/*.md'
+
+  link-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@f548e57e544e1ff5a4c46bf1e1b8685f8e4a348a # main
+      - uses: gaurav-nelson/github-action-markdown-link-check@0524e79d8d7d1606112722dd7a3b5f5ce367de3e # master
