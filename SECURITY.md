@@ -17,23 +17,26 @@ holds the record for the other profile repository.
   the `markdown-lint` and `link-check` status checks (owner-reported; no tool
   available to this record's verifying environment can read rulesets, so this
   is taken on the owner's word, not independently confirmed).
-- **Secret scanning / push protection / Dependabot security updates:** not
-  confirmed. The environment that verified this record has no route to the
-  repository security-settings API — check directly under Settings → Advanced Security.
-- **Private vulnerability reporting:** not confirmed.
-- **Actions default workflow permissions:** not confirmed.
-- **Signed commits on `main`:** not confirmed whether ticked on the ruleset.
-- **`has_wiki` / `has_projects`:** off (confirmed live via the GitHub API).
+- **Secret scanning / push protection / Dependabot security updates:** enabled (owner-confirmed).
+- **Private vulnerability reporting:** enabled (owner-confirmed).
+- **Actions default workflow permissions:** read-only, and Actions cannot create
+  or approve pull requests (owner-confirmed).
+- **Merge settings:** squash-only merges with automatic head-branch deletion
+  (owner-confirmed).
+- **Signed commits on `main`:** owner-confirmed as actioned on the ruleset.
+- **`has_wiki` / `has_projects`:** off (verified via the GitHub API).
 - **Secrets stored:** none. Stats cards are unauthenticated public reads; no token is needed or present. The profile README no longer embeds stats cards at all (removed 2026-08-27 — the public github-readme-stats.vercel.app instance kept rendering broken even on the built-in theme).
 
-## Outstanding
+## Provenance
 
-Still not independently confirmed (this environment has no tool that reaches
-these endpoints, so they can only be taken on the owner's word or checked
-directly): secret scanning, push protection, Dependabot security updates,
-private vulnerability reporting, Actions default workflow permissions,
-delete-branch-on-merge and merge-method restrictions, and whether "Require
-signed commits" is ticked on this repo's ruleset. Confirm each under
-Settings → Advanced Security / General / Actions / Rulesets, and update the
-relevant line above once seen — not on the strength of a toggle having been
-clicked.
+Two levels of confidence are used above, deliberately:
+
+- **verified via the GitHub API** — read back live from GitHub by the
+  environment maintaining this record.
+- **owner-confirmed** — applied and checked by the owner in the GitHub
+  Settings UI. The environment maintaining this record has no tool that
+  reaches the repository security-settings, Actions-permissions, or ruleset
+  endpoints, so it cannot independently confirm these.
+
+Anything re-checked later should be updated in place, and promoted to
+"verified" only once actually read back.
